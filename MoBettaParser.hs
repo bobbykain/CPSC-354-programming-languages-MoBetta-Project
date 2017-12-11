@@ -16,11 +16,11 @@ import MoBettaAST
 type Parser = Parsec Void String
 
 programParser = do
-  spaceConsumer
-  sepEndBy1 statementParser semicolon <?>  "program"
+    spaceConsumer
+    sepEndBy1 statementParser semicolon <?>  "program"
 
 statementParser = choice
-  [   skipStmt
+    [ skipStmt
     , printStmt
     , messageStmt
     , readStmt
@@ -28,71 +28,75 @@ statementParser = choice
     , whileStmt
     , assignmentStmt
     , blockStmt
-  ] <?> "statement"
+    ] <?> "statement"
   where
     skipStmt = lexeme (string "skip") >> return Skip
     printStmt = do
-      lexeme (string "print")
-      e <- aExpr
-      return (Print e)
+        lexeme (string "print")
+        e <- aExpr
+        return (Print e)
     readStmt = do
-      lexeme (string "read")
-      i <- identifier
-      return (Read i)
+        lexeme (string "read")
+        i <- identifier
+        return (Read i)
     messageStmt = do
-      lexeme (string "message")
-      s <- lexeme stringLiteral
-      return (Msg s)
+        lexeme (string "message")
+        s <- lexeme stringLiteral
+        return (Msg s)
     ifStmt = do
-      lexeme (string "if")
-      b <- bExpr
-      lexeme (string "then")
-      t <- statementParser
-      lexeme (string "else")
-      e <- statementParser
-      return (If b t e)
+        lexeme (string "if")
+        b <- bExpr
+        lexeme (string "then")
+        t <- statementParser
+        lexeme (string "else")
+        e <- statementParser
+        return (If b t e)
     whileStmt = do
-      lexeme (string "while")
-      b <- bExpr
-      lexeme (string "do")
-      e <- statementParser
-      return (While b e)
+        lexeme (string "while")
+        b <- bExpr
+        lexeme (string "do")
+        e <- statementParser
+        return (While b e)
     assignmentStmt = do
-      v <- identifier
-      lexeme (char '=')
-      e <- aExpr
-      return (Assign v e)
+        v <- identifier
+        lexeme (char '=')
+        e <- aExpr
+        return (Assign v e)
     blockStmt = do
-      stmts <- between lbrace rbrace programParser
-      return (Block stmts)
+        stmts <- between lbrace rbrace programParser
+        return (Block stmts)
 
 aExpr :: Parser AExpr
 aExpr = makeExprParser aFactor aOpTable <?> "arithmetic expression"
 
 -- parenthesized expressions are missing
-aFactor = choice [ intConst
-                , identifierExpr
-                , between lparen rparen aExpr
-                ] <?> "arithmetic factor"
+aFactor = choice
+    [ intConst
+    , identifierExpr
+    , between lparen rparen aExpr
+    ] <?> "arithmetic factor"
 
-aOpTable = [ [ prefix  "-"  (AUn Neg)
-            , prefix  "+" id ] -- including a prefix + sign
-          , [ binary  "*"  (ABin Mul)
-            , binary  "/"  (ABin Div)
-            , binary  "%"  (ABin Mod)]
-          , [ binary  "+"  (ABin Add)
-            , binary  "-"  (ABin Sub)  ] ]
+aOpTable =
+    [ [ prefix  "-"  (AUn Neg)
+      , prefix  "+" id ] -- including a prefix + sign
+    , [ binary  "*"  (ABin Mul)
+      , binary  "/"  (ABin Div)
+      , binary  "%"  (ABin Mod)]
+    , [ binary  "+"  (ABin Add)
+      , binary  "-"  (ABin Sub) ] ]
 
 bExpr :: Parser BExpr
 bExpr = makeExprParser bFactor bOpTable <?> "Boolean expression"
 
-bFactor = choice [ comparison
-                 , between lparen rparen bExpr
-                 ] <?> "boolean factor"
+bFactor = choice
+    [ comparison
+    , between lparen rparen bExpr
+    ] <?> "boolean factor"
 
-bOpTable = [ [ prefix  "not"  (BUn Not)]
-           , [ binary  "and"  (BBin And)
-             , binary  "or"  (BBin Or)] ]
+bOpTable =
+    [ [ prefix  "not"  (BUn Not)]
+    , [ binary  "and"  (BBin And)
+      , binary  "or"  (BBin Or) ] ]
 
 comparison = do
     e1 <- aExpr
@@ -102,14 +106,13 @@ comparison = do
 
 comparator = choice compTable <?> "comparator"
 
-compTable = [
-    atomic "<"  Less
-  , atomic "<=" LessEqual
-  , atomic ">"  Greater
-  , atomic ">=" GreaterEqual
-  , atomic "==" Equal
-  , atomic "!=" NEqual
-  ]
+compTable =
+    [ atomic "<"  Less
+    , atomic "<=" LessEqual
+    , atomic ">"  Greater
+    , atomic ">=" GreaterEqual
+    , atomic "==" Equal
+    , atomic "!=" NEqual]
 
 -- These help declare operators
 binary  opName f = InfixL (atomic opName f) -- left associative bin
@@ -147,9 +150,9 @@ intConst = fmap IntConst intConst'
   where
     intConst' = (lexeme . try) ic
     ic = do
-          x <- L.decimal -- parse a literal
-          notFollowedBy letterChar -- fail if followed by a letter
-          return x -- return the  result if we haven't failed
+        x <- L.decimal -- parse a literal
+        notFollowedBy letterChar -- fail if followed by a letter
+        return x -- return the  result if we haven't failed
 
 tryit p = parse p "(--)"
 

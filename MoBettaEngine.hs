@@ -53,7 +53,7 @@ statementAction (Print e) = printAction (intCalc e) -- display result of calcula
 statementAction (Msg s) = msgAction s -- display string s
 statementAction (Read v) =  readAction v -- read in a value for v
 statementAction (If b s1 s2) =
-  ifAction (boolCalc b) (statementAction s1) (statementAction s2)
+    ifAction (boolCalc b) (statementAction s1) (statementAction s2)
                         -- Calculate b, then decide which computation to do
 statementAction (While b s) = whileAction (boolCalc b) (statementAction s)
                         -- compute "while b s"
@@ -89,8 +89,8 @@ updateEnv name val = modify $ HM.insert name val
 -- HM.lookup can fail if the identifier we are trying to retrieve does not exist. So "val" is a "Maybe Int" -- "fromMaybe" is a simple way to deal with Maybe failures.
 retrieveEnv :: String -> Computation Integer
 retrieveEnv name = do
-  val <- gets $ HM.lookup name
-  return $ fromMaybe (varNotFound name) val
+    val <- gets $ HM.lookup name
+    return $ fromMaybe (varNotFound name) val
   where
     varNotFound name = error $ "Identifier \"" ++ name ++ "\" not defined."
 
@@ -103,12 +103,12 @@ Now we define the semantics of each type of action.
 -- Read and store an integer in a variable
 readAction :: String -> Action
 readAction v = do
-  x <- doIO getInt
-  updateEnv v x
+    x <- doIO getInt
+    updateEnv v x
   where
     getInt = do
-      inp <- getLine
-      return $ read inp
+        inp <- getLine
+        return $ read inp
 
 -- Display a string
 msgAction :: String -> Action
@@ -117,76 +117,75 @@ msgAction s = doIO $ putStr s
 -- Display result of computing an integer
 printAction :: IntCalc -> Action
 printAction intCalc = do
-  n <- intCalc
-  doIO $ putStr $ show n
+    n <- intCalc
+    doIO $ putStr $ show n
 
 -- Compute an integer, then store it
 assignAction :: String -> IntCalc -> Action
 assignAction v intCalc = do
-  n <- intCalc
-  updateEnv v n
+    n <- intCalc
+    updateEnv v n
 
 -- Compute a boolean, use it to decide which computation to do.
 ifAction :: BoolCalc -> Action -> Action -> Action
 ifAction boolCalc action1 action2 = do
-  boolCond <- boolCalc
-  if boolCond then
-    action1
-  else
-    action2
+    boolCond <- boolCalc
+    if boolCond
+        then action1
+        else action2
 
 whileAction :: BoolCalc -> Action -> Action
 whileAction boolCalc action = do
-  cond <- boolCalc
-  when cond loop
+    cond <- boolCalc
+    when cond loop
   where
     loop = do
-      action
-      whileAction boolCalc action
+        action
+        whileAction boolCalc action
 
 -- Do a list of actions sequentially.
 blockAction :: [Action] -> Action
 blockAction [] = return ()
 blockAction (a:ls) = do
-  a
-  blockAction ls
+    a
+    blockAction ls
 
 aBinOps =
-  [ (Add, (+))
-  , (Sub, (-))
-  , (Mul, (*))
-  , (Div, div)
-  , (Mod, mod)]
+    [ (Add, (+))
+    , (Sub, (-))
+    , (Mul, (*))
+    , (Div, div)
+    , (Mod, mod)]
 
-aUnOps =  [(Neg, negate)]
+aUnOps = [(Neg, negate)]
 
 bBinOps =
-  [ (And, (&&))
-  , (Or, (||))]
+    [ (And, (&&))
+    , (Or, (||))]
 
-bUnOps =  [(Not, not)]
+bUnOps = [(Not, not)]
 
 relnOps =
-  [ (Greater, (>))
-  , (GreaterEqual, (>=))
-  , (Less, (<))
-  , (LessEqual, (<=))
-  , (Equal, (==))
-  , (NEqual, (/=))]
+    [ (Greater, (>))
+    , (GreaterEqual, (>=))
+    , (Less, (<))
+    , (LessEqual, (<=))
+    , (Equal, (==))
+    , (NEqual, (/=))]
 
 boolCalc :: BExpr -> BoolCalc
 boolCalc (BoolConst b) = return b
 boolCalc (Reln cOp expr1 expr2) = do
     ex1 <- intCalc expr1
     ex2 <- intCalc expr2
-    return ((fromMaybe(error "Should never happen.")(lookup cOp relnOps))ex1 ex2)
+    return $ (fromMaybe (error "Should never happen.") (lookup cOp relnOps)) ex1 ex2
 boolCalc (BBin op expr1 expr2) = do
     ex1 <- boolCalc expr1
     ex2 <- boolCalc expr2
-    return ((fromMaybe(error "Should never happen.")(lookup op bBinOps))ex1 ex2)
+    return $ (fromMaybe (error "Should never happen.") (lookup op bBinOps)) ex1 ex2
 boolCalc (BUn op expr) = do
     ex <- boolCalc expr
-    return ((fromMaybe(error "Should never happen.")(lookup op bUnOps)) ex)
+    return $ (fromMaybe (error "Should never happen.") (lookup op bUnOps)) ex
 
 intCalc :: AExpr -> IntCalc
 intCalc (Var v) = retrieveEnv v
@@ -195,8 +194,8 @@ intCalc (ABin op expr1 expr2) = do
     ex1 <- intCalc expr1
     ex2 <- intCalc expr2
     if ex2 == 0 && op == Div
-        then error "Division by zero can never happen."
-            else return ((fromMaybe(error "This should never happen.")(lookup op aBinOps))ex1 ex2)
+       then error "Division by zero can never happen."
+       else return $ (fromMaybe (error "This should never happen.") (lookup op aBinOps)) ex1 ex2
 intCalc (AUn op expr) = do
     ex <- intCalc expr
-    return ((fromMaybe(error "This should never happen")(lookup op aUnOps)) ex)
+    return $ (fromMaybe (error "This should never happen") (lookup op aUnOps)) ex

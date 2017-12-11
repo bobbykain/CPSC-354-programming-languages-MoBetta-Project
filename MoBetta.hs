@@ -12,11 +12,10 @@ main = do
     args <- getArgs
     let fileName = head args
     putStrLn $ "MoBetta running file: " ++ fileName ++ " ...\n"
-    handle <- openFile fileName ReadMode
-          -- open file named by initial argument
+    handle <- openFile fileName ReadMode  -- open file named by initial argument
     contents <- hGetContents handle  -- get entire contents of file lazily
     let pr = mbparse fileName contents
     case pr of
-      Right prog -> evalStateT (makeProgram prog) emptyEnv
-      Left err  -> putStrLn $ parseErrorPretty' contents err
+        Right prog -> evalStateT (makeProgram prog) emptyEnv
+        Left err -> putStrLn $ parseErrorPretty' contents err
     hClose handle  -- your mom taught you to clean up after yourself
