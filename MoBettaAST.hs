@@ -27,14 +27,13 @@ data BExpr
 data BinBOp = And | Or deriving (Show,Eq)
 data UnBOp = Not deriving (Show,Eq)
 
-data Comp
-    = Less
-    | LessEqual
-    | Greater
-    | GreaterEqual
-    | Equal
-    | NEqual
-    deriving (Show,Eq)
+data Comp = Less
+          | LessEqual
+          | Greater
+          | GreaterEqual
+          | Equal
+          | NEqual
+          deriving (Show,Eq)
 
 -- Refactored to reduce the number of cases in evaluation.
 data AExpr
@@ -44,12 +43,11 @@ data AExpr
     | AUn UnAOp AExpr
     deriving (Show)
 
-data BinAOp
-    = Add
-    | Sub
-    | Mul
-    | Div
-    | Mod
-    deriving (Show,Eq)
+data BinAOp = Add
+            | Sub
+            | Mul
+            | Div
+            | Mod
+            deriving (Show,Eq)
 
 data UnAOp = Neg deriving (Show, Eq)
