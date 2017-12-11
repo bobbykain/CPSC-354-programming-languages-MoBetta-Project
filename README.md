@@ -1,4 +1,4 @@
-# Class: CPCS 354 Programming Languages
+# CPCS 354 Programming Languages
 
 **MoBetta Final Project**
 
