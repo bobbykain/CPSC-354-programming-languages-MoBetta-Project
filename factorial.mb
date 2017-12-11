@@ -1,0 +1,15 @@
+// A factorial program
+message "Enter an integer: ";
+read n;
+saveN = n;
+r = 1;
+while n > 0 do
+{
+  r = r * n;
+  n = n - 1
+};
+message "Factorial of ";
+print saveN;
+message  " is ";
+print r;
+message ".\n"

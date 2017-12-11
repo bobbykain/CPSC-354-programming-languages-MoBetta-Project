@@ -1,0 +1,21 @@
+// Bad print a TicTacToe board
+// Causes an undefined variable error
+
+row = 1;
+while col < 12 do {
+  col = 1;
+
+  while col < 24 do {
+    if row%4 == 0 and col%8 == 0 then
+      message "+"
+    else if row%4 == 0 then
+      message "-"
+    else if col%8 == 0 then
+      message "|"
+    else
+      message " ";
+    col = col + 1
+  };
+  message "\n";
+  row = row + 1
+};

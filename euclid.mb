@@ -1,0 +1,24 @@
+// Euclid's Algorithm
+message "Enter an integer: ";
+read a;
+saveA = a;
+
+message "Enter another integer: ";
+read b;
+saveB = b;
+saveN = n;
+
+while a > 0 do
+{
+  tmp = a;
+  a = b % a;
+  b = tmp
+};
+
+message "GCD(";
+print saveA;
+message  ",";
+print saveB;
+message ") = ";
+print b;
+message ".\n"
