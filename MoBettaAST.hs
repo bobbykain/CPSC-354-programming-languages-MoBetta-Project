@@ -44,7 +44,6 @@ data AExpr
     | AUn UnAOp AExpr
     deriving (Show)
 
---data BinAOp = Add | Sub | Mul | Div | Mod deriving (Show,Eq)
 data BinAOp
     = Add
     | Sub
